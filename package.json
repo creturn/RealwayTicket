@@ -3,8 +3,8 @@
 	"main":"app.html",
 	"window" : {
 		"title" : "Ticket App",
-		// "toolbar" : false, //浏览器toolbar
-		"width" : 400,
+		"toolbar" : false, //浏览器toolbar
+		"width" : 1000,
 		"height" : 600,
 		// "frame": false //是否显示窗口
 		"show": false

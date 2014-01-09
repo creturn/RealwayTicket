@@ -3,9 +3,12 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>我的第一个app应用</title>
-	<link rel="stylesheet" type="text/css" href="asset/css/bootstrap.min.css" />
+	<title>我要抢票</title>
+	<link rel="stylesheet" type="text/css" href="asset/plugin/Flat_UI/bootstrap/css/bootstrap.css" />	
+	<link rel="stylesheet" type="text/css" href="asset/plugin/Flat_UI/css/flat-ui.css" />	
 	<link rel="stylesheet" type="text/css" href="asset/plugin/jquery-autocomplete/src/jquery.autocomplete.css">
+	<link rel="stylesheet" type="text/css" href="asset/plugin/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" />	
+
 	<style type="text/css">
 	.panel-heading {
 		  -webkit-user-select: none;
@@ -21,31 +24,64 @@
 </head>
 <body>
 	<div class="panel panel-default">
-  	<div class="panel-heading">
-        <!-- <button type="button" class="close">&times;</button> -->
-		车票查询
-    </div>
-	  <div class="panel-body">
-		<div class="row" >
-			<div class="form-group">
-				<label for="start"></label>
-   				<input type="text" class="form-control" id="start_station" placeholder="始发">
-			</div>
-			<div class="form-group">
-				<label for="end"></label>
-   				<input type="text" class="form-control" id="end_station" placeholder="终点">
-			</div>
-			<div class="form-group">
-				<button class="btn btn-success" type="button" id="findTicket">
-					 查询
-				</button>
-			</div>
+  	<div class="panel-heading nav">
+  		<div class="navbar-left">
+			车票查询
 		</div>
+		<div class="navbar-right">
+			<span class="glyphicon glyphicon-user"></span>
+		</div>
+
+    </div>
+	  <div class="panel-body clearfix">
+		<div class="container">
+			<div class="row" >
+				<div class="col-xs-2">
+		   			<input type="text" data-date-format="yyyy-mm-dd hh:ii" class="form-control" id="time_station" value="2014-01-12" placeholder="乘车日期">
+				</div>
+				<div class="col-xs-2">
+		   			<input type="text" class="form-control" id="start_station" placeholder="始发">
+				</div>
+				<div class="col-xs-2">
+		   			<input type="text" class="form-control" id="end_station" placeholder="终点">
+				</div>
+				<div class="col-xs-2">
+					<button class="btn btn-primary fui-search" type="button" id="findTicket" >
+						 查询
+					</button>
+				</div>
+				<div class="col-xs-2">
+					<button class="btn btn-primary" type="button" >
+						 <span class="glyphicon glyphicon-refresh"></span>
+						 自动
+					</button>
+				</div>
+			</div>
+			<div class="row">&nbsp;</div>
+		</div>
+		<div class="container">
+				<table class="table table-hover table-bordered table-condensed">
+					 <thead>
+					 	<tr>
+					 		<td>车次</td>
+					 		<td>出发站-到达站</td>
+					 		<td>历时</td>
+					 		<td>二等座</td>
+					 		<td>硬座</td>
+							<td>无座</td>
+					 		<td>操作</td>
+					 	</tr>
+					 </thead>
+					 <tbody id="station_content">
+					 </tbody>
+				</table>
+			</div>
 	  </div>
 	</div>
 	<script type="text/javascript" src="asset/js/jquery.js"></script>
 	<script type="text/javascript" src="asset/js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="asset/plugin/jquery-autocomplete/src/jquery.autocomplete.js"></script>
+	<script type="text/javascript" src="asset/plugin/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
 	<script type="text/javascript" src="model/station_name.js"></script>
 	<script type="text/javascript">
 		/**
@@ -53,6 +89,7 @@
 		 * @type {string}
 		 */
 		var stationArr = station_names.split('@');
+
 		$("#start_station").autocomplete({
 			data: stationArr,
 			minChars: 2,
@@ -77,17 +114,41 @@
 				$("#end_station").val(item.value.split('|')[1]).attr('station',item.value.split('|')[2]);
 			}
 		});
-		
+		/**
+		 * 点击查询按钮
+		 */
 		$("#findTicket").click(function(){	
-			for (var i = 0; i < stationArr.length; i++) {
-				console.log('Station:' + stationArr[i]);
-			};
+			var st_time = $('#time_station').val();
+			var st_start = $('#start_station').val();
+			var st_end = $('#end_station').val();
+			if (st_time && st_start && st_end) {
+				st_start = $('#start_station').attr('station');
+				st_end = $('#end_station').attr('station');
+				var checkTickUrl = 'https://kyfw.12306.cn/otn/leftTicket/query?leftTicketDTO.train_date='+st_time+'&leftTicketDTO.from_station='+ st_start +'&leftTicketDTO.to_station='+ st_end +'&purpose_codes=ADULT';
+				$.get(checkTickUrl,function(data){
+					if (data.status == true) {
+						for (var i = 0; i < data.data.length; i++) {
+							var recordStr = '<tr><td>'+data.data[i].queryLeftNewDTO.station_train_code+'</td>';
+							recordStr += '<td>'+ data.data[i].queryLeftNewDTO.from_station_name + '-' +data.data[i].queryLeftNewDTO.end_station_name  +'</td>';
+							recordStr += '<td>'+ data.data[i].queryLeftNewDTO.lishi +'</td>';
+							recordStr += '<td>'+ data.data[i].queryLeftNewDTO.ze_num +'</td>';
+							recordStr += '<td>'+ data.data[i].queryLeftNewDTO.yz_num +'</td>';
+							recordStr += '<td>'+ data.data[i].queryLeftNewDTO.wz_num +'</td>';
+							recordStr += '<td><button class="btn-info btn-xs">'+ data.data[i].queryLeftNewDTO.canWebBuy +'</button></td></tr>';
+							$('#station_content').append(recordStr);
+
+						};
+					};
+				},'json');
+			} else {
+				alert('不能查票！');
+			}
 		});
 		$("#open-new").click(function(){
 				console.log("open window");
 				var gui = require('nw.gui');
 				var new_win = gui.Window.get(window.open('http://tieba.baidu.com'));
-			});
+		});
 	</script>
 </body>
 </html>
