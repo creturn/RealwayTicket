@@ -1,14 +1,8 @@
-GolangStudy
+RealwayTicket 抢票软件
 ===========
 
-Golang 学习过程中的实验代码
+最近看了一下nodejs ,发现其中的有一个扩展node-webkit比较有意思
 
-作为一个PHP coder 学习下新的东西还是比较有意思的
-
-尤其是golang的语法有C的味道, 又有Python的优雅 ^_^
-
-这里参照的是 [build web application with golang](https://github.com/astaxie/build-web-application-with-golang)
-
-作者写的还是不错的值得一看，当然Golang的官方的 [tour](http://tour.golang.org) 也是不错
+可以用来做跨平台软件开发，这里就用它来写个抢票软件玩玩
 
 code for fun  !
