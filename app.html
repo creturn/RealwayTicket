@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh-cn">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>我的第一个app应用</title>
+	<link rel="stylesheet" type="text/css" href="asset/css/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="asset/plugin/jquery-autocomplete/src/jquery.autocomplete.css">
+	<style type="text/css">
+	.panel-heading {
+		  -webkit-user-select: none;
+		  -webkit-app-region: drag;
+		}
+	</style>
+	<script type="text/javascript">
+		var gui = require('nw.gui');
+		onload = function() {
+  			gui.Window.get().show();
+		}
+	</script>
+</head>
+<body>
+	<div class="panel panel-default">
+  	<div class="panel-heading">
+        <!-- <button type="button" class="close">&times;</button> -->
+		车票查询
+    </div>
+	  <div class="panel-body">
+		<div class="row" >
+			<div class="form-group">
+				<label for="start"></label>
+   				<input type="text" class="form-control" id="start_station" placeholder="始发">
+			</div>
+			<div class="form-group">
+				<label for="end"></label>
+   				<input type="text" class="form-control" id="end_station" placeholder="终点">
+			</div>
+			<div class="form-group">
+				<button class="btn btn-success" type="button" id="findTicket">
+					 查询
+				</button>
+			</div>
+		</div>
+	  </div>
+	</div>
+	<script type="text/javascript" src="asset/js/jquery.js"></script>
+	<script type="text/javascript" src="asset/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="asset/plugin/jquery-autocomplete/src/jquery.autocomplete.js"></script>
+	<script type="text/javascript" src="model/station_name.js"></script>
+	<script type="text/javascript">
+		/**
+		 * 火车站站点信息
+		 * @type {string}
+		 */
+		var stationArr = station_names.split('@');
+		$("#start_station").autocomplete({
+			data: stationArr,
+			minChars: 2,
+			max: 20,
+			showResult: function(value, data){
+				return '<span style="color:red">' + value.split('|')[1] + '</span>';
+			},
+			onItemSelect: function(item){
+				console.log(item)
+				$("#start_station").val(item.value.split('|')[1]).attr('station',item.value.split('|')[2]);
+			}
+		});
+		$("#end_station").autocomplete({
+			data: stationArr,
+			minChars: 2,
+			max: 20,
+			showResult: function(value, data){
+				return '<span style="color:red">' + value.split('|')[1] + '</span>';
+			},
+			onItemSelect: function(item){
+				console.log(item)
+				$("#end_station").val(item.value.split('|')[1]).attr('station',item.value.split('|')[2]);
+			}
+		});
+		
+		$("#findTicket").click(function(){	
+			for (var i = 0; i < stationArr.length; i++) {
+				console.log('Station:' + stationArr[i]);
+			};
+		});
+		$("#open-new").click(function(){
+				console.log("open window");
+				var gui = require('nw.gui');
+				var new_win = gui.Window.get(window.open('http://tieba.baidu.com'));
+			});
+	</script>
+</body>
+</html>
